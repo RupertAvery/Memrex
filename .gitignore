@@ -1,0 +1,6 @@
+obj/
+*.cpp~
+*.h~
+makefile~
+bin/
+nbproject/
