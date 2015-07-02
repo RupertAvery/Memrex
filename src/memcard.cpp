@@ -1,25 +1,39 @@
 #include "memcard.h"
 
 void Memcard::Read(char* filepath) {
-    _fp = fopen(filepath, "r");
+    FILE* fp = fopen(filepath, "r");
 
+	if (fp == NULL) {
+		printf("Unable to open %s!\n", filepath);
+		//printf("%d!\n", errno);
+		return;
+	}
+	
     char * fileext = &filepath[strlen(filepath) - 4];
-    printf("%s", fileext);
+    //printf("%s\n", fileext);
 
     if (strcasecmp(fileext, ".mem") == 0) {
-        fseek(_fp, 64, SEEK_SET);
+        fseek(fp, 64, SEEK_SET);
     } else {
-        fseek(_fp, 0, SEEK_SET);
+        fseek(fp, 0, SEEK_SET);
     }
 
-    fread(directory, 1, BLOCK_SIZE, _fp);
-    fread(data, BLOCK_SIZE, 14, _fp);
+    fread(directory, 1, BLOCK_SIZE, fp);
+    fread(data, BLOCK_SIZE, 14, fp);
    
-    fclose(_fp);
+    fclose(fp);
 }
 
 DIRENTRY* Memcard::GetDirEntry(int index) {
     return (DIRENTRY*) (directory + FRAME_SIZE + (index * FRAME_SIZE));
+}
+
+TITLE* Memcard::GetTitle(int block) {
+    return (TITLE*) (data[block]);
+}
+
+ICON* Memcard::GetIcon(int block, int frame) {
+    return (ICON*) (data[block] + (frame * FRAME_SIZE));
 }
 
 Memcard::~Memcard() {

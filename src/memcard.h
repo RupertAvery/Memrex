@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "strings.h"
+#include "error.h"
 
 #define BLOCK_STATE_INUSE 0x50
 #define BLOCK_STATE_FREE 0xA0
@@ -26,7 +27,7 @@ struct DIRENTRY {
 };
 
 struct ICON {
-    char data[8][16];
+    unsigned char data[16][8];
 };
 
 struct CLUT {
@@ -40,7 +41,14 @@ struct TITLE {
     char title[64]; 
     char reserved1[12];
     char reserved2[16];
-    CLUT palette[16];
+    char palette[32];
+};
+
+struct ARGB {
+	unsigned char a;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 };
 
 struct DATAFRAME {
@@ -51,13 +59,15 @@ class Memcard {
     private:
         FILE* _fp;
         char directory[BLOCK_SIZE];
-        char data[BLOCK_SIZE][14];
+        char data[14][BLOCK_SIZE];
         unsigned long mc_data_start; 
 
     public:
         void Read(char* filepath);
         DIRENTRY* GetDirEntry(int index);
-        
+        TITLE* GetTitle(int index);
+		ICON* GetIcon(int block, int frame);
+		
     	~Memcard();
 
 };

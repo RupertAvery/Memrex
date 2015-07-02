@@ -11,15 +11,20 @@ EXECUTABLE=memrex
 PATHOBJECTS=$(addprefix $(OBJDIR)/,$(OBJECTS))
 PATHSOURCES=$(addprefix $(SRCDIR)/,$(SOURCES))
 
-all: $(PATHSOURCES) $(EXECUTABLE)
+all: $(PATHOBJECTS) $(EXECUTABLE)
 
-debug: debugflags $(PATHSOURCES) $(EXECUTABLE)
+debug: debugflags $(PATHOBJECTS) $(EXECUTABLE)
 
 clean:
 	rm -f $(PATHOBJECTS) $(BINDIR)/$(EXECUTABLE)
 
 debugflags:
 	$(eval DEBUG := -g3 -gdwarf-2 -g -DDEBUG)
+
+outputfolders: | $(OBJDIR) $(BINDIR)
+	
+$(OBJDIR) $(BINDIR): 
+	mkdir -p $(OBJDIR) $(BINDIR)
 
 $(EXECUTABLE): $(PATHOBJECTS)
 	$(CC) $(LDFLAGS) $(PATHOBJECTS) -o $(BINDIR)/$@
