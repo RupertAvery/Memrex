@@ -36,6 +36,7 @@ ICON* Memcard::GetIcon(int block, int frame) {
     return (ICON*) (data[block] + (frame * FRAME_SIZE));
 }
 
+
 Memcard::~Memcard() {
 
 }
