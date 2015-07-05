@@ -8,8 +8,11 @@ void MemCardView::DrawIcon(int index, int frame, int size) {
 	{
 		frame = icon[index].frameCount - 1;
 	}
+
 	glBindTexture(GL_TEXTURE_2D, icon[index].texture[frame]);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	GLNUM vertices[4][2] = {
        { 0,  0  },
@@ -18,7 +21,7 @@ void MemCardView::DrawIcon(int index, int frame, int size) {
        { size, size }
 	};
 
-	GLNUM texCoords[4][2] = {
+	GLfloat texCoords[4][2] = {
 	   { 0,  0  },
        { 0,  1 },
        { 1,  0 },
@@ -26,7 +29,7 @@ void MemCardView::DrawIcon(int index, int frame, int size) {
 	};
 
 	glVertexPointer(2, GLTYPE, 0, vertices);
-	glTexCoordPointer(2, GLTYPE, 0, texCoords);
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -36,7 +39,9 @@ void MemCardView::DrawIcon(int index, int frame, int size) {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-    glDisable(GL_TEXTURE_2D);
+    	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+
 	glPopMatrix();
 }
 
@@ -73,7 +78,7 @@ void MemCardView::BuildTexture(GLuint *texture, ICON* icon, char *palette) {
 	glBindTexture(GL_TEXTURE_2D, *texture);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16 ,16, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 } 
 
 int MemCardView::getIconCount()

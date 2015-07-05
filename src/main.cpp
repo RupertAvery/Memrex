@@ -3,8 +3,7 @@
 #include <stdio.h>
 #include GLHEADER
  
-#include "SDL_image.h" //Needed for IMG_Load.  If you want to use bitmaps (SDL_LoadBMP), it appears to not be necessary
-#include "SDL_opengl.h"
+#include "SDL_image.h" 
 
 #include "memcardview.h"
 #include <sys/timeb.h>
