@@ -81,15 +81,22 @@ else()
     endif()
 endif()
 
+if(DEFINED BCMHOST)
+    link_directories(
+        "/opt/vc/lib"
+    )
+endif()
+
 set(COMMON_LIBRARIES
 	${SDL2_LIBRARY}
 )
 
 
+
 if(DEFINED BCMHOST)
     LIST(APPEND COMMON_LIBRARIES
-        bcm_host
-        EGL
+	bcm_host
+	EGL
         ${OPENGLES_LIBRARIES}
     )
 else()
@@ -110,7 +117,7 @@ else()
     endif()
 endif()
 
- MESSAGE(${OPENGL_INCLUDE_DIR})
+MESSAGE(${OPENGLES_LIBRARIES})
 
 include_directories(${COMMON_INCLUDE_DIRS})
 
