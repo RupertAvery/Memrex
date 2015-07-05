@@ -1,16 +1,41 @@
 #include "memcardview.h"
+#include "font.h"
+#include <initializer_list>
 
-void MemCardView::DrawIcon(int index) {
+void MemCardView::DrawIcon(int index, int frame, int size) {
 	glPushMatrix();
-	glTranslatef(0.5f, -0.5f, 0.0f);
-	glBindTexture(GL_TEXTURE_2D, textures[index]);
+	if(frame > icon[index].frameCount - 1)
+	{
+		frame = icon[index].frameCount - 1;
+	}
+	glBindTexture(GL_TEXTURE_2D, icon[index].texture[frame]);
 	glEnable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f( -1.0f, -1.0f, 0.0f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(  1.0f, -1.0f, 0.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(  1.0f,  1.0f, 0.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f( -1.0f,  1.0f, 0.0f);
-	glEnd();
+
+	GLNUM vertices[4][2] = {
+       { 0,  0  },
+       { 0,  size },
+	   { size, 0  },
+       { size, size }
+	};
+
+	GLNUM texCoords[4][2] = {
+	   { 0,  0  },
+       { 0,  1 },
+       { 1,  0 },
+       { 1,  1  } 
+	};
+
+	glVertexPointer(2, GLTYPE, 0, vertices);
+	glTexCoordPointer(2, GLTYPE, 0, texCoords);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
     glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
@@ -53,7 +78,7 @@ void MemCardView::BuildTexture(GLuint *texture, ICON* icon, char *palette) {
 
 int MemCardView::getIconCount()
 {
-	return textureCount;
+	return iconCount;
 }
  
 char* MemCardView::SJIStoASCII(char* sjis)
@@ -135,7 +160,7 @@ void MemCardView::Load(char * path) {
 	mc->Read(path);
 	printf("Loading %s\n", path);
 
-	textureCount = 0;
+	iconCount = 0;
 
 	for(int i = 0; i < 15; i++)
 	{	
@@ -144,11 +169,16 @@ void MemCardView::Load(char * path) {
 		if (dir->blockAllocationState == 0x51) {
 			TITLE* title = mc->GetTitle(i);
 			printf("Block %d: %s (%x %d) %.*s\n", i + 1, (char *)&dir->filename,  title->iconDisplayFlag, title->blockNumber, 32, SJIStoASCII(title->title));
-			//int iconCount = (title->iconDisplayFlag & 0xF);
+			int frameCount = (title->iconDisplayFlag & 0xF);
+			icon[iconCount].frameCount = frameCount;	
 
-			BuildTexture(&textures[textureCount], mc->GetIcon(i, 1), title->palette);
+			for(int frame = 0; frame < frameCount; frame++)
+			{
+				BuildTexture(&icon[iconCount].texture[frame], mc->GetIcon(i, frame + 1), title->palette);
+			}
+
 		
-			textureCount++;
+			iconCount++;
 
 		}		
 	}
@@ -156,9 +186,12 @@ void MemCardView::Load(char * path) {
 }
 
 MemCardView::~MemCardView() {
-	if(textureCount > 0)
+	if(iconCount > 0)
 	{
-    	glDeleteTextures(textureCount, textures);
+		for(int i=0;i < iconCount; i++)
+		{
+	    	glDeleteTextures(icon[i].frameCount, icon[i].texture);
+		}
 	}
 }
 

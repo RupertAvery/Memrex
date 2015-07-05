@@ -42,6 +42,7 @@ if(${GLSystem} MATCHES "Desktop OpenGL")
 else()
     find_package(OpenGLES REQUIRED)
 endif()
+find_package(Freetype REQUIRED)
 find_package(SDL2 REQUIRED)
 
 set(MAIN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -54,11 +55,13 @@ endif()
 
 set(MAIN_SOURCES
 	${MAIN_SOURCE_DIR}/main.cpp
+	${MAIN_SOURCE_DIR}/font.cpp
 	${MAIN_SOURCE_DIR}/memcardview.cpp
 	${MAIN_SOURCE_DIR}/memcard.cpp
 )
 
 set(COMMON_INCLUDE_DIRS
+    ${FREETYPE_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIR}
 )
 
@@ -88,6 +91,7 @@ if(DEFINED BCMHOST)
 endif()
 
 set(COMMON_LIBRARIES
+    ${FREETYPE_LIBRARIES}
 	${SDL2_LIBRARY}
 )
 
@@ -122,7 +126,7 @@ MESSAGE(${OPENGLES_LIBRARIES})
 include_directories(${COMMON_INCLUDE_DIRS})
 
 add_executable(memrex ${MAIN_SOURCES})
-
+add_definitions(-std=c++11) 
 target_link_libraries(memrex ${COMMON_LIBRARIES})
 
 

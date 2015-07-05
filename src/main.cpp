@@ -8,7 +8,13 @@
 #include "SDL_opengl.h"
 
 #include "memcardview.h"
+#include <sys/timeb.h>
 
+int frame;
+int frameCount;
+int currentTime;
+int previousTime;
+int fps;
 
 bool get_input(void) {
     SDL_Event event;
@@ -25,53 +31,114 @@ bool get_input(void) {
     return true;
 }
 
+int getMilliCount(){
+	timeb tb;
+	ftime(&tb);
+	int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
+	return nCount;
+}
+
+//-------------------------------------------------------------------------
+// Calculates the frames per second
+//-------------------------------------------------------------------------
+void calculateFPS()
+{
+    //  Increase frame count
+    frameCount++;
+ 
+    //  Get the number of milliseconds since glutInit called
+    //  (or first call to glutGet(GLUT ELAPSED TIME)).
+    currentTime = getMilliCount();
+ 
+    //  Calculate time passed
+    int timeInterval = currentTime - previousTime;
+ 
+    if(timeInterval > 1000)
+    {
+        //  calculate the number of frames per second
+        fps = frameCount / (timeInterval / 1000.0f);
+ 
+        //  Set time
+        previousTime = currentTime;
+ 
+        //  Reset frame count
+        frameCount = 0;
+    }
+}
 
 void draw(SDL_Window * window, MemCardView *view) {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
  
-    glViewport(0,0, 800, 600);
-    glMatrixMode(GL_PROJECTION);
+
     glLoadIdentity();
-	gluOrtho2D(0.0, 800.0, -600.0, 0.0);
-//    gluPerspective(45.0, (double)(800)/(double)(600), 0.1f,100.0f);
-    glMatrixMode(GL_MODELVIEW);
  
-    glLoadIdentity();
-    //gluLookAt(2.0,3.0,4.0, 0.0,0.0,0.0, 0.0,1.0,0.0);
- 
-	glTranslatef( 48.0f, -48.0f, 0.0f ); 
-	glScalef( 32.0f, 32.0f, 32.0f); 
+	glTranslatef( 10.0f, 10.0f, 0.0f ); 
+	int size = 64;
+	int padding = 16;
 
 	for(int i=0; i < view->getIconCount(); i++)
 	{
 		if((i > 0) && (i % 3 == 0))
 		{
-			glTranslatef( -2.5f * 3, -2.5f, 0.0f ); 
+			//glTranslatei( -2.5f * 3, -2.5f, 0.0f ); 
 		}
-		view->DrawIcon(i);
-		glTranslatef( 2.5f, 0.0f, 0.0f ); 
+		view->DrawIcon(i, frame, size);
+		glTranslatef( (float)(size + padding), 0.0f, 0.0f ); 
 	}
 
+	if(frameCount % 11 == 0)
+	{
+		frame++;
+		if(frame==3) frame = 0; 
+	}
     SDL_GL_SwapWindow(window);
 }
+
+
 
 
 int main(int argc, char* argv[]) {
 	printf("Starting Memrex...\n");
 
 
+	unsigned int display_width = 0;
+	unsigned int display_height = 0;
+
     SDL_Window *window;                    // Declare a pointer
-SDL_GLContext maincontext; 
+	SDL_GLContext maincontext; 
     SDL_Init(SDL_INIT_EVERYTHING);              // Initialize SDL2
+
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	// multisample anti-aliasing
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+
+#ifdef USE_OPENGL_ES
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+#endif
+
+	SDL_DisplayMode dispMode;
+	SDL_GetDesktopDisplayMode(0, &dispMode);
+
+	if(display_width == 0)
+		display_width = dispMode.w;
+
+	if(display_height == 0)
+		display_height = dispMode.h;
 
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
-        "An SDL2 window",                  // window title
+        "Memrex",                  // window title
         SDL_WINDOWPOS_UNDEFINED,           // initial x position
         SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        800,                               // width, in pixels
-        600,                               // height, in pixels
-        SDL_WINDOW_OPENGL                  // flags - see below
+        display_width,                               // width, in pixels
+        display_height,                               // height, in pixels
+        SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN    // flags - see below
     );
 
     // Check that the window was successfully made
@@ -87,9 +154,17 @@ SDL_GLContext maincontext;
 	MemCardView *view = new MemCardView();
 	view->Load(argv[1]);
  
+	glViewport(0, 0, display_width, display_height);
+	glMatrixMode(GL_PROJECTION);
+	glOrtho(0, display_width, display_height, 0, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	//glClearColor(0.4f, 1.0f, 1.0f, 0.0f);
+
+
     while (true) {
         if (!get_input()) break;
         draw(window, view);
+		calculateFPS();
     }
 
 	delete (view);

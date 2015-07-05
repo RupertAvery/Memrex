@@ -1,3 +1,6 @@
+#ifndef __MEMCARD_H__
+#define __MEMCARD_H__
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -71,3 +74,5 @@ class Memcard {
     	~Memcard();
 
 };
+
+#endif //__MEMCARD_H__
