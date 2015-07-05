@@ -133,7 +133,7 @@ else()
     endif()
 endif()
 
-MESSAGE(${OPENGLES_LIBRARIES})
+#MESSAGE(${OPENGLES_LIBRARIES})
 
 include_directories(${COMMON_INCLUDE_DIRS})
 

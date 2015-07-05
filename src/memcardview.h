@@ -1,8 +1,9 @@
 #ifndef __MEMCARDVIEW_H__
 #define __MEMCARDVIEW_H__
 
-#include "memcard.h"
 #include "platform.h"
+#include GLHEADER
+#include "memcard.h"
 
 #ifdef USE_OPENGL_ES
 	#define	GLNUM GLshort
