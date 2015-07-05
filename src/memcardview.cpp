@@ -1,5 +1,5 @@
 #include "memcardview.h"
-#include "font.h"
+//#include "font.h"
 #include <initializer_list>
 
 void MemCardView::DrawIcon(int index, int frame, int size) {

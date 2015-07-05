@@ -2,8 +2,7 @@
 #define __MEMCARDVIEW_H__
 
 #include "memcard.h"
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include "platform.h"
 
 #ifdef USE_OPENGL_ES
 	#define	GLNUM GLshort

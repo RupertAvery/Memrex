@@ -42,7 +42,7 @@ if(${GLSystem} MATCHES "Desktop OpenGL")
 else()
     find_package(OpenGLES REQUIRED)
 endif()
-find_package(Freetype REQUIRED)
+#find_package(Freetype REQUIRED)
 find_package(SDL2 REQUIRED)
 
 set(MAIN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -53,9 +53,21 @@ else()
     add_definitions(-DUSE_OPENGL_ES)
 endif()
 
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-attributes -O3")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3")
+
+if(${GLSystem} MATCHES "Desktop OpenGL")
+    add_definitions(-DUSE_OPENGL_DESKTOP)
+else()
+    add_definitions(-DUSE_OPENGL_ES)
+endif()
+
+
+
 set(MAIN_SOURCES
 	${MAIN_SOURCE_DIR}/main.cpp
-	${MAIN_SOURCE_DIR}/font.cpp
+#	${MAIN_SOURCE_DIR}/font.cpp
 	${MAIN_SOURCE_DIR}/memcardview.cpp
 	${MAIN_SOURCE_DIR}/memcard.cpp
 )
@@ -126,7 +138,6 @@ MESSAGE(${OPENGLES_LIBRARIES})
 include_directories(${COMMON_INCLUDE_DIRS})
 
 add_executable(memrex ${MAIN_SOURCES})
-add_definitions(-std=c++11) 
 target_link_libraries(memrex ${COMMON_LIBRARIES})
 
 

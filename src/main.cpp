@@ -1,14 +1,17 @@
+#include "platform.h"
 #include "SDL.h"
 #include <stdio.h>
-
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include GLHEADER
  
 #include "SDL_image.h" //Needed for IMG_Load.  If you want to use bitmaps (SDL_LoadBMP), it appears to not be necessary
 #include "SDL_opengl.h"
 
 #include "memcardview.h"
 #include <sys/timeb.h>
+
+#ifdef USE_OPENGL_ES
+    #define glOrtho glOrthof
+#endif
 
 int frame;
 int frameCount;
