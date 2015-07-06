@@ -44,6 +44,7 @@ else()
 endif()
 #find_package(Freetype REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(SDL2_IMAGE REQUIRED)
 
 set(MAIN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -54,7 +55,7 @@ else()
 endif()
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-attributes -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3")
 
 if(${GLSystem} MATCHES "Desktop OpenGL")
@@ -75,6 +76,7 @@ set(MAIN_SOURCES
 set(COMMON_INCLUDE_DIRS
     ${FREETYPE_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIR}
+    ${SDL2_IMAGE_INCLUDE_DIR}
 )
 
 if(DEFINED BCMHOST)
@@ -105,6 +107,7 @@ endif()
 set(COMMON_LIBRARIES
     ${FREETYPE_LIBRARIES}
 	${SDL2_LIBRARY}
+	${SDL2_IMAGE_LIBRARY}
 )
 
 
@@ -140,4 +143,9 @@ include_directories(${COMMON_INCLUDE_DIRS})
 add_executable(memrex ${MAIN_SOURCES})
 target_link_libraries(memrex ${COMMON_LIBRARIES})
 
-
+if(MSVC)
+	add_custom_command(TARGET memrex POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy "$ENV{SDL_WIN32_PATH}\\bin\\SDL2.dll" $(OutDir)
+		COMMAND ${CMAKE_COMMAND} -E copy "$ENV{SDL_WIN32_PATH}\\bin\\SDL2_image.dll" $(OutDir)
+	)
+endif()
