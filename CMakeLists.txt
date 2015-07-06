@@ -44,7 +44,7 @@ else()
 endif()
 #find_package(Freetype REQUIRED)
 find_package(SDL2 REQUIRED)
-find_package(SDL2_IMAGE REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 set(MAIN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

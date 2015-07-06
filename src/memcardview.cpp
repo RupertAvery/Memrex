@@ -77,7 +77,7 @@ void MemCardView::BuildTexture(GLuint *texture, ICON* icon, char *palette) {
 
 	glGenTextures(1, texture);
 
-	printf("Building texture %d\n", *texture);
+	//printf("Building texture %d\n", *texture);
 
 	for (int y = 0; y < 16; y++)
 	{
@@ -184,28 +184,45 @@ void MemCardView::Load(char * path) {
 	printf("Loading %s\n", path);
 
 	iconCount = 0;
+	int totalBlocksUsed = 0;
 
 	for (int i = 0; i < 15; i++)
 	{
 		DIRENTRY* dir = mc->GetDirEntry(i);
 
+		//printf("Allocation: %x\n", dir->blockAllocationState);
+
 		if (dir->blockAllocationState == 0x51) {
 			TITLE* title = mc->GetTitle(i);
 			printf("Block %d: %s (%x %d) %.*s\n", i + 1, (char *)&dir->filename, title->iconDisplayFlag, title->blockNumber, 32, SJIStoASCII(title->title));
 			int frameCount = (title->iconDisplayFlag & 0xF);
-			icon[iconCount].frameCount = frameCount;
-			icon[iconCount].currentFrame = 0;
-
-			for (int frame = 0; frame < frameCount; frame++)
+			if(frameCount > 0 && frameCount < 4)
 			{
-				BuildTexture(&icon[iconCount].texture[frame], mc->GetIcon(i, frame + 1), title->palette);
+				icon[iconCount].frameCount = frameCount;
+				icon[iconCount].currentFrame = 0;
+				for (int frame = 0; frame < frameCount; frame++)
+				{
+					BuildTexture(&icon[iconCount].texture[frame], mc->GetIcon(i, frame + 1), title->palette);
+				}
+				iconCount++;
 			}
 
+			int blocksUsed = 1;
 
-			iconCount++;
+			DIRENTRY* next = dir;
 
+			while (next->nextBlockNo > 0) {
+				blocksUsed++;
+				next = mc->GetDirEntry(next->nextBlockNo);
+			}
+
+			printf("Used: %d\n", blocksUsed);
+			totalBlocksUsed += blocksUsed;
 		}
 	}
+
+	printf("TOTAL: %d\n", totalBlocksUsed);
+
 	delete(mc);
 }
 
