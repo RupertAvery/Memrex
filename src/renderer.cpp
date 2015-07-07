@@ -131,16 +131,19 @@ void calculateFPS()
 }
 
 void draw(MemCardView *view) {
+	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glLoadIdentity();
 	view->Render(window);
 
-	  GLfloat black[4] = {0, 0, 0, 1};
+	  GLfloat black[4] = {255, 255, 255, 1};
 	  //glUniform4f(uniform_color, 1, black);
 
-	  float sx = 2.0 / display_width;
-	  float sy = 2.0 / display_height;
+	  float sx = 20.0 / display_width;
+	  float sy = 20.0 / display_height;
 
+	glLoadIdentity();
 	textDrawer.renderText("Hello World!",10,10,sx,sy);
 	SDL_GL_SwapWindow(window);
 }

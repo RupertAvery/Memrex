@@ -270,6 +270,7 @@ FT_Face face;
 GLuint createShaderProgram(const char * _strVertex, const char * _strFragment)
 {
 	GLuint vertex_shader_object = glCreateShader(GL_VERTEX_SHADER);
+
 	glShaderSource(vertex_shader_object, 1, &_strVertex, NULL);
 	glCompileShader(vertex_shader_object);
 	//assert(checkShaderCompileStatus(vertex_shader_object));
@@ -278,6 +279,9 @@ GLuint createShaderProgram(const char * _strVertex, const char * _strFragment)
 	glShaderSource(fragment_shader_object, 1, &_strFragment, NULL);
 	glCompileShader(fragment_shader_object);
 	//assert(checkShaderCompileStatus(fragment_shader_object));
+
+	fprintf(stderr, "vso: %d\n", vertex_shader_object );
+	fprintf(stderr, "fso: %d\n", fragment_shader_object );
 
 	GLuint program = glCreateProgram();
 	glBindAttribLocation(program, SC_POSITION, "aPosition");
@@ -289,7 +293,6 @@ GLuint createShaderProgram(const char * _strVertex, const char * _strFragment)
 	
 //assert(checkProgramLinkStatus(program));
 	
-	fprintf(stderr, "Program: %d\n", program );
 	return program;
 
 	
@@ -374,13 +377,14 @@ void TextDrawer::renderText(const char *_pText, float _x, float _y, float sx, fl
 	//glUseProgram(m_program);
 
 	/* Enable blending, necessary for our alpha texture */
+	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	/* Set color */
 	//glUniform4fv(m_uColor, 1, 0xFFFFFF);
-
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	/* Use the texture containing the atlas */
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_pAtlas->tex);
@@ -421,4 +425,6 @@ void TextDrawer::renderText(const char *_pText, float _x, float _y, float sx, fl
 	glBufferData(GL_ARRAY_BUFFER, coords.size()*sizeof(point), coords.data(), GL_DYNAMIC_DRAW);
 	glDrawArrays(GL_TRIANGLES, 0, c);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDisable(GL_TEXTURE_2D);
 }
