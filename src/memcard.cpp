@@ -19,6 +19,9 @@ void Memcard::Read(char* filepath) {
 	if (strcasecmp(fileext, ".mem") == 0) {
 		fseek(fp, 64, SEEK_SET);
 	}
+	else if (strcasecmp(fileext, ".gme") == 0) {
+		fseek(fp, 0xF40, SEEK_SET);
+	}
 	else
 	{
 		fseek(fp, 0, SEEK_SET);

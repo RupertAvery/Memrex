@@ -42,7 +42,7 @@ if(${GLSystem} MATCHES "Desktop OpenGL")
 else()
     find_package(OpenGLES REQUIRED)
 endif()
-#find_package(Freetype REQUIRED)
+find_package(Freetype REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
@@ -68,7 +68,8 @@ endif()
 
 set(MAIN_SOURCES
 	${MAIN_SOURCE_DIR}/main.cpp
-#	${MAIN_SOURCE_DIR}/font.cpp
+	${MAIN_SOURCE_DIR}/font.cpp
+	${MAIN_SOURCE_DIR}/renderer.cpp
 	${MAIN_SOURCE_DIR}/memcardview.cpp
 	${MAIN_SOURCE_DIR}/memcard.cpp
 )

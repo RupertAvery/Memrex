@@ -2,8 +2,12 @@
 #define __MEMCARDVIEW_H__
 
 #include "platform.h"
+#include "SDL.h"
 #include GLHEADER
 #include "memcard.h"
+#include <sys/timeb.h>
+#include <math.h>
+#include <time.h>
 
 #ifdef USE_OPENGL_ES
 #define	GLNUM GLshort
@@ -29,12 +33,22 @@ class MemCardView {
 	char* SJIStoASCII(char* sjis);
 	GLNUM vertices[4][2];
 
+	int display_width;
+	int display_height;
+
+	int x[15];
+	int y[15];
+	int dx[15];
+	int dy[15];
+
 public:
 	int getIconCount();
 	void SetIconSize(int iconSize);
 	void DrawIcon(int index);
 	void AnimateIcons();
+	void InitView(int display_width, int display_height);
 	void Load(char * path);
+	void Render(SDL_Window * window);
 	~MemCardView();
 };
 

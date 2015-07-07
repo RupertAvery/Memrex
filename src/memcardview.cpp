@@ -9,6 +9,45 @@ GLfloat texCoords[4][2] = {
 	{ 1, 1 }
 };
 
+void MemCardView::Render(SDL_Window * window) {
+	int size = 64;
+	int padding = 16;
+
+	//for (int i = 0; i < view->getIconCount(); i++)
+	//{
+	//	if ((i > 0) && (i % 3 == 0))
+	//	{
+	//		//glTranslatei( -2.5f * 3, -2.5f, 0.0f ); 
+	//	}
+	//	view->DrawIcon(i);
+	//	glTranslatef((float)(size + padding), 0.0f, 0.0f);
+	//}
+
+	for (int i = 0; i < getIconCount(); i++)
+	{
+		x[i] += dx[i];
+		if (x[i] < 0) dx[i] = -dx[i];
+		if (x[i] + 64 > display_width) dx[i] = -dx[i];
+		y[i] += dy[i];
+
+		if (y[i] < 0) dy[i] = -dy[i];
+		if (y[i] + 64 > display_height) dy[i] = -dy[i];
+	}
+
+	//glTranslatef(display_width / 2, display_height / 2, 0.0f);
+
+	for (int i = 0; i < getIconCount(); i++)
+	{
+		glPushMatrix();
+		glTranslatef(x[i], y[i], 0.0f);
+		DrawIcon(i);
+		glPopMatrix();
+	}
+
+	//t++;
+	
+}
+
 void MemCardView::SetIconSize(int iconSize)
 {
 	GLNUM v[4][2] = {
@@ -223,7 +262,24 @@ void MemCardView::Load(char * path) {
 
 	printf("TOTAL: %d\n", totalBlocksUsed);
 
+
+
 	delete(mc);
+}
+
+void MemCardView::InitView(int width, int height) {
+	srand(time(NULL));
+
+	for (int i = 0; i < getIconCount(); i++)
+	{
+		printf("%d", rand() % 2);
+		dx[i] = ((rand() % 2) == 1) ? 1 : -1;
+		dy[i] = ((rand() % 2) == 1) ? 1 : -1;
+		x[i] = rand() % (width - 64);
+		y[i] = rand() % (height - 64);
+	}
+	display_width = width;
+	display_height = height;
 }
 
 MemCardView::~MemCardView() {
